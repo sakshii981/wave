@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Blue Waves Animation</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background-color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="waveCanvas" width="2000" height="1500"></canvas>
+  <script>
+    const canvas = document.getElementById("waveCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let amplitude = 50;
+    let frequency = 0.03;
+    let speed = 0.1;
+    let offset = 0;
+
+    let ball = {
+      x: canvas.width / 4,
+      y: canvas.height / 4,
+      radius: 30,
+      velocityX: 2,
+    };
+
+    function drawWave() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.beginPath();
+      ctx.moveTo(0, canvas.height / 2);
+
+      for (let x = 0; x < canvas.width; x++) {
+        const wave = amplitude * Math.sin(frequency * x + offset);
+        ctx.lineTo(x, canvas.height / 2 + wave);
+      }
+
+      ctx.lineTo(canvas.width, canvas.height);
+      ctx.lineTo(0, canvas.height);
+      ctx.closePath();
+      ctx.fillStyle = "#007bff";
+      ctx.fill();
+
+      offset += speed;
+      requestAnimationFrame(drawWave);
+    }
+
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fillStyle = "#ff0000"; 
+      ctx.fill();
+      ctx.closePath();
+
+      const waveHeight = amplitude * Math.sin(frequency * ball.x + offset);
+
+      
+      ball.y = canvas.height / 2 + waveHeight;
+
+      
+      ball.x += ball.velocityX;
+
+      
+      if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) {
+        ball.velocityX = -ball.velocityX;
+      }
+
+      requestAnimationFrame(drawBall);
+    }
+
+    canvas.addEventListener("mousemove", (e) => {
+      const boundingRect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - boundingRect.left;
+      const mouseY = e.clientY - boundingRect.top;
+      
+     
+      amplitude = (canvas.height / 2 - mouseY) * 0.7;
+      frequency = (canvas.width / 2 - mouseX) * 0.001;
+
+     
+      amplitude = Math.min(Math.max(amplitude, 5), 100);
+      frequency = Math.min(Math.max(frequency, 0.001), 0.1);
+    });
+
+    drawWave();
+    drawBall();
+
+  </script>
+</body>
+</html>  
